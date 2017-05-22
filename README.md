@@ -43,7 +43,7 @@ Tested on:
 
 ## why i wrote passh
 
-1. I got a `Newifi Mini` router and installed `OpenWRT` on it. I want the router to be my `SOCKS` proxy so I run `ssh -D 8888 user@host` at boot time but the SSH server only supports password auth. On Linux I would use `Expect` to automate `ssh` but `OpenWRT` does not install `Expect` by default and my router does not have enough storage for the extra `Tcl` and `Expect` packages.
+1. I got a `Newifi Mini` router and installed `OpenWRT` on it. I want the router to be my `SOCKS` proxy so I run `ssh -D 8888 user@host` automatically at boot time but the SSH server only supports password auth. On Linux I would use `Expect` to automate `ssh` but `OpenWRT` does not install `Expect` by default and my router does not have enough storage for the extra `Tcl` and `Expect` packages.
 
 1. Then I tried [`sshpass`][sshpass] but `sshpass` seems more like a nice hack and it's *broken* by design. See following example on a Linux system:
 
