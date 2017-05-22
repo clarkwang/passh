@@ -38,39 +38,40 @@ Tested on:
 ## why i wrote passh
 
 1. I got a `Newifi Mini` router and installed `OperWRT` to it. I want the router to be my `SOCKS` proxy so I `ssh -D 8888 user@host` but the SSH server does not support public key auth. `OpenWRT` does not have `Expect` by default and my router has no enough storage for the `Tcl` and `Expect` packages.
+
 1. Then I tried `sshpass`. But to me, `sshpass` is more like a hack and it's *broken* by design. See following example on a Linux system:
 
-	$ tty
-	/dev/pts/18
-	$ sshpass bash --norc
-	bash: cannot set terminal process group (-1): Inappropriate ioctl for device
-	bash: no job control in this shell
-	bash-4.4# tty
-	/dev/pts/18
-	bash-4.4# ps p $$
-	   PID TTY      STAT   TIME COMMAND
-	 37151 pts/36   Ss+    0:00 bash --norc
-	bash-4.4# ps t pts/36
-	   PID TTY      STAT   TIME COMMAND
-	 37151 pts/36   Ss+    0:00 bash --norc
-	 37154 pts/36   R+     0:00 ps t pts/36
-	bash-4.4#
+        $ tty
+        /dev/pts/18
+        $ sshpass bash --norc
+        bash: cannot set terminal process group (-1): Inappropriate ioctl for device
+        bash: no job control in this shell
+        bash-4.4# tty
+        /dev/pts/18
+        bash-4.4# ps p $$
+           PID TTY      STAT   TIME COMMAND
+         37151 pts/36   Ss+    0:00 bash --norc
+        bash-4.4# ps t pts/36
+           PID TTY      STAT   TIME COMMAND
+         37151 pts/36   Ss+    0:00 bash --norc
+         37154 pts/36   R+     0:00 ps t pts/36
+        bash-4.4#
         
      Now let's try `passh`:
  
-	$ tty
-	/dev/pts/18
-	$ passh bash --norc
-	bash-4.4# tty
-	/dev/pts/36
-	bash-4.4# ps p $$
-	   PID TTY      STAT   TIME COMMAND
-	 37159 pts/36   Ss     0:00 bash --norc
-	bash-4.4# ps t pts/36
-	   PID TTY      STAT   TIME COMMAND
-	 37159 pts/36   Ss     0:00 bash --norc
-	 37162 pts/36   R+     0:00 ps t pts/36
-	bash-4.4#
+        $ tty
+        /dev/pts/18
+        $ passh bash --norc
+        bash-4.4# tty
+        /dev/pts/36
+        bash-4.4# ps p $$
+           PID TTY      STAT   TIME COMMAND
+         37159 pts/36   Ss     0:00 bash --norc
+        bash-4.4# ps t pts/36
+           PID TTY      STAT   TIME COMMAND
+         37159 pts/36   Ss     0:00 bash --norc
+         37162 pts/36   R+     0:00 ps t pts/36
+        bash-4.4#
         
 ## examples
 
