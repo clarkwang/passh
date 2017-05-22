@@ -66,13 +66,13 @@ Tested on:
      Now let's try `passh`:
  
         $ tty
-        /dev/pts/18
+        /dev/pts/18                                      // now we're on pts/18
         $ passh bash --norc
         bash-4.4# tty
-        /dev/pts/36
+        /dev/pts/36                                      // the bash's stdin is connected to the new pts/36
         bash-4.4# ps p $$
            PID TTY      STAT   TIME COMMAND
-         37159 pts/36   Ss     0:00 bash --norc
+         37159 pts/36   Ss     0:00 bash --norc          // pts/36 is its controlling terminal
         bash-4.4# ps t pts/36
            PID TTY      STAT   TIME COMMAND
          37159 pts/36   Ss     0:00 bash --norc
