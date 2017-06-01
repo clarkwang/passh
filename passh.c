@@ -40,6 +40,7 @@
 #define DEFAULT_TIMEOUT  0
 #define DEFAULT_PASSWD   "password"
 #define DEFAULT_PROMPT   "[Pp]assword: \\{0,1\\}$"
+#define DEFAULT_YESNO    "(yes/no)? \\{0,1\\}$"
 
 #define ERROR_GENERAL    (200 + 1)
 #define ERROR_USAGE      (200 + 2)
@@ -62,9 +63,12 @@ static struct {
         bool ignore_case;
         bool nohup_child;
         bool fatal_no_prompt;
+        bool auto_yesno;
         char *password;
-        char *prompt;
+        char *passwd_prompt;
+        char *yesno_prompt;
         regex_t re_prompt;
+        regex_t re_yesno;
         int timeout;
         int tries;
         bool fatal_more_tries;
@@ -80,19 +84,24 @@ usage(int exitcode)
 {
     printf("Usage: %s [OPTION]... COMMAND...\n"
            "\n"
-           "  -c <N>          Send at most <N> passwords (0 means infinite. default: %d)\n"
+           "  -c <N>          Send at most <N> passwords (0 means infinite. Default: %d)\n"
            "  -C              Exit if prompted for the <N+1>th password\n"
            "  -h              Help\n"
            "  -i              Case insensitive for password prompt matching\n"
            "  -n              Nohup the child (e.g. used for `ssh -f')\n"
-           "  -p <password>   The password (default: `" DEFAULT_PASSWD "')\n"
+           "  -p <password>   The password (Default: `" DEFAULT_PASSWD "')\n"
            "  -p env:<var>    Read password from env var\n"
            "  -p file:<file>  Read password from file\n"
-           "  -P <prompt>     Regexp (BRE) for the password prompt (default: `" DEFAULT_PROMPT "')\n"
+           "  -P <prompt>     Regexp (BRE) for the password prompt\n"
+           "                  (Default: `" DEFAULT_PROMPT "')\n"
            "  -l <file>       Save data written to the pty\n"
            "  -L <file>       Save data read from the pty\n"
-           "  -t <timeout>    Timeout waiting for next password prompt (0 means no timeout. default: %d)\n"
+           "  -t <timeout>    Timeout waiting for next password prompt\n"
+           "                  (0 means no timeout. Default: %d)\n"
            "  -T              Exit if timed out waiting for password prompt\n"
+           "  -y              Auto answer `yes/no' questions\n"
+           "  -Y <pattern>    Regexp (BRE) for the `yes/no' prompt\n"
+           "                  (Default: `" DEFAULT_YESNO "')\n"
            "\n"
            "Report bugs to Clark Wang <dearvoid@gmail.com>\n"
            "", g.progname, DEFAULT_COUNT, DEFAULT_TIMEOUT);
@@ -138,7 +147,8 @@ fatal_sys(const char *fmt, ...)
 void
 startup()
 {
-    g.opt.prompt = DEFAULT_PROMPT;
+    g.opt.passwd_prompt = DEFAULT_PROMPT;
+    g.opt.yesno_prompt = DEFAULT_YESNO;
     g.opt.password = DEFAULT_PASSWD;
     g.opt.tries = DEFAULT_COUNT;
     g.opt.timeout = DEFAULT_TIMEOUT;
@@ -194,7 +204,7 @@ getargs(int argc, char **argv)
      * POSIXLY_CORRECT is set, then option processing stops as soon as a
      * nonoption argument is encountered.
      */
-    while ((ch = getopt(argc, argv, "+:c:Chil:L:np:P:t:T")) != -1) {
+    while ((ch = getopt(argc, argv, "+:c:Chil:L:np:P:t:TyY:")) != -1) {
         switch (ch) {
             case 'c':
                 g.opt.tries = atoi(optarg);
@@ -232,7 +242,7 @@ getargs(int argc, char **argv)
                 break;
 
             case 'P':
-                g.opt.prompt = optarg;
+                g.opt.passwd_prompt = optarg;
                 break;
 
             case 't':
@@ -241,6 +251,14 @@ getargs(int argc, char **argv)
 
             case 'T':
                 g.opt.fatal_no_prompt = true;
+                break;
+
+            case 'y':
+                g.opt.auto_yesno = true;
+                break;
+
+            case 'Y':
+                g.opt.yesno_prompt = optarg;
                 break;
 
             case '?':
@@ -256,15 +274,21 @@ getargs(int argc, char **argv)
     }
     g.opt.command = argv;
 
-    if (0 == strlen(g.opt.prompt) ) {
+    if (0 == strlen(g.opt.passwd_prompt) ) {
         fatal(ERROR_USAGE, "Error: empty prompt");
     }
 
+    /* Password: */
     reflag = 0;
     reflag |= g.opt.ignore_case ? REG_ICASE : 0;
-    r = regcomp(&g.opt.re_prompt, g.opt.prompt, reflag);
+    r = regcomp(&g.opt.re_prompt, g.opt.passwd_prompt, reflag);
     if (r != 0) {
-        fatal(ERROR_USAGE, "Error: invalid prompt RE pattern");
+        fatal(ERROR_USAGE, "Error: invalid RE for password prompt");
+    }
+    /* (yes/no)? */
+    r = regcomp(&g.opt.re_yesno, g.opt.yesno_prompt, reflag);
+    if (r != 0) {
+        fatal(ERROR_USAGE, "Error: invalid RE for yes/no prompt");
     }
 }
 
@@ -786,7 +810,23 @@ L_chk_sigchld:
 
                 /* match password prompt and send the password */
                 if (! g.now_interactive && ! given_up) {
-                    if (regexec(&g.opt.re_prompt, cache, 1, re_match, 0) == 0) {
+                    if (g.opt.auto_yesno && passwords_seen == 0
+                        && regexec(&g.opt.re_yesno, cache, 1, re_match, 0) == 0)
+                    {
+                        /*
+                         * (yes/no)?
+                         */
+                        char *yes = "yes\r";
+
+                        write2(g.fd_ptym, fd_to_pty, yes, strlen(yes) );
+
+                        ncache -= re_match[0].rm_eo;
+                        cache += re_match[0].rm_eo;
+                    } else if (regexec(&g.opt.re_prompt, cache, 1, re_match, 0) == 0) {
+                        /*
+                         * Password:
+                         */
+
                         ++passwords_seen;
 
                         last_time = time(NULL);
@@ -905,7 +945,10 @@ main(int argc, char *argv[])
     /*
      * parent
      */
-    if (g.stdin_is_tty) {
+
+    /* stdout also needs to be checked. Or `passh ls -l | less' would not
+     * restore the saved tty settings. */
+    if (g.stdin_is_tty && isatty(STDOUT_FILENO) ) {
         /* user's tty to raw mode */
         if (tty_raw(STDIN_FILENO, &g.save_termios) < 0)
             fatal_sys("tty_raw error");

@@ -13,19 +13,24 @@
 ```
 Usage: passh [OPTION]... COMMAND...
 
-  -c <N>          Send at most <N> passwords (0 means infinite. default: 0)
+  -c <N>          Send at most <N> passwords (0 means infinite. Default: 0)
   -C              Exit if prompted for the <N+1>th password
   -h              Help
   -i              Case insensitive for password prompt matching
   -n              Nohup the child (e.g. used for `ssh -f')
-  -p <password>   The password (default: `password')
+  -p <password>   The password (Default: `password')
   -p env:<var>    Read password from env var
   -p file:<file>  Read password from file
-  -P <prompt>     Regexp (BRE) for the password prompt (default: `[Pp]assword: \{0,1\}$')
+  -P <prompt>     Regexp (BRE) for the password prompt
+                  (Default: `[Pp]assword: \{0,1\}$')
   -l <file>       Save data written to the pty
   -L <file>       Save data read from the pty
-  -t <timeout>    Timeout waiting for next password prompt (0 means no timeout. default: 0)
+  -t <timeout>    Timeout waiting for next password prompt
+                  (0 means no timeout. Default: 0)
   -T              Exit if timed out waiting for password prompt
+  -y              Auto answer `yes/no' questions
+  -Y <pattern>    Regexp (BRE) for the `yes/no' prompt
+                  (Default: `(yes/no)? \{0,1\}$')
 
 Report bugs to Clark Wang <dearvoid@gmail.com>
 ```
