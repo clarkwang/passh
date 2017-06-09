@@ -28,9 +28,7 @@ Usage: passh [OPTION]... COMMAND...
   -t <timeout>    Timeout waiting for next password prompt
                   (0 means no timeout. Default: 0)
   -T              Exit if timed out waiting for password prompt
-  -y              Auto answer `yes/no' questions
-  -Y <pattern>    Regexp (BRE) for the `yes/no' prompt
-                  (Default: `(yes/no)? \{0,1\}$')
+  -y              Auto answer `(yes/no)?' questions
 
 Report bugs to Clark Wang <dearvoid@gmail.com>
 ```

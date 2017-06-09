@@ -99,9 +99,11 @@ usage(int exitcode)
            "  -t <timeout>    Timeout waiting for next password prompt\n"
            "                  (0 means no timeout. Default: %d)\n"
            "  -T              Exit if timed out waiting for password prompt\n"
-           "  -y              Auto answer `yes/no' questions\n"
+           "  -y              Auto answer `(yes/no)?' questions\n"
+#if 0
            "  -Y <pattern>    Regexp (BRE) for the `yes/no' prompt\n"
            "                  (Default: `" DEFAULT_YESNO "')\n"
+#endif
            "\n"
            "Report bugs to Clark Wang <dearvoid@gmail.com>\n"
            "", g.progname, DEFAULT_COUNT, DEFAULT_TIMEOUT);
@@ -122,7 +124,7 @@ fatal(int rcode, const char *fmt, ...)
     /* in case stdout and stderr are the same */
     fflush(stdout);
 
-    fprintf(stderr, "!! %s\n", buf);
+    fprintf(stderr, "!! %s\r\n", buf);
 
     /* flush all open files */
     fflush(NULL);
@@ -204,7 +206,7 @@ getargs(int argc, char **argv)
      * POSIXLY_CORRECT is set, then option processing stops as soon as a
      * nonoption argument is encountered.
      */
-    while ((ch = getopt(argc, argv, "+:c:Chil:L:np:P:t:TyY:")) != -1) {
+    while ((ch = getopt(argc, argv, "+:c:Chil:L:np:P:t:Ty")) != -1) {
         switch (ch) {
             case 'c':
                 g.opt.tries = atoi(optarg);
@@ -256,11 +258,11 @@ getargs(int argc, char **argv)
             case 'y':
                 g.opt.auto_yesno = true;
                 break;
-
+#if 0
             case 'Y':
                 g.opt.yesno_prompt = optarg;
                 break;
-
+#endif
             case '?':
             default:
                 fatal(ERROR_USAGE, "Error: unknown option '-%c'", optopt);
