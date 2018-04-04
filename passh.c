@@ -263,6 +263,10 @@ getargs(int argc, char **argv)
                 g.opt.yesno_prompt = optarg;
                 break;
 #endif
+            case ':':
+                fatal(ERROR_USAGE, "Error: option '-%c' requires an argument", optopt);
+                break;
+
             case '?':
             default:
                 fatal(ERROR_USAGE, "Error: unknown option '-%c'", optopt);
@@ -941,7 +945,7 @@ main(int argc, char *argv[])
             sig_handle(SIGHUP, SIG_IGN);
         }
         if (execvp(g.opt.command[0], g.opt.command) < 0)
-            fatal_sys("can't execute: %s", argv[optind]);
+            fatal_sys("can't execute: %s", g.opt.command[0]);
     }
 
     /*
