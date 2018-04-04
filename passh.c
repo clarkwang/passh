@@ -12,7 +12,7 @@
  * - On OS X EI Capitan (10.11.6), definging _XOPEN_SOURCE=600 would cause
  *   SIGWINCH to be undefined.
  */
-#ifndef __APPLE__
+#if !defined(__APPLE__) && !defined(__FreeBSD__)
 #define _XOPEN_SOURCE 600 /* for posix_openpt() */
 #endif
 
@@ -802,7 +802,7 @@ L_chk_sigchld:
                 if (! given_up) {
                     for (i = 0; i < nread; ++i) {
                         if (cache[ncache + i] == 0) {
-                            cache[ncache + i] = 255;
+                            cache[ncache + i] = 0xff;
                         }
                     }
                 }
