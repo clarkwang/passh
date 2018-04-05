@@ -41,6 +41,7 @@ Tested on:
 * Debian Linux 8, x86_64 (Jessie)
 * macOS 10.12 (Sierra)
 * Cygwin, x86_64 (on Windows 7)
+* FreeBSD 11.1, x86_64
 
   [newifi]: https://wiki.openwrt.org/toh/lenovo/lenovo_y1_v1
 
