@@ -113,7 +113,7 @@ Tested on:
     
 1. Login to a remote server
 
-        $ passh -p password user@host
+        $ passh -p password ssh user@host
     
 1. Run a command on remote server
 
