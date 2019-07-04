@@ -83,6 +83,8 @@ Tested on:
          37162 pts/36   R+     0:00 ps t pts/36
         bash-4.4#
 
+    See [sshpass-broken.md](sshpass-broken.md) for more *sshpass is broken* examples.
+
   [sshpass]: https://sourceforge.net/projects/sshpass/
 
 ## examples
