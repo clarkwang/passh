@@ -57,7 +57,7 @@ Example #3
 Example #4
 ----------
 
-    % sshpass bash -norc
+    $ sshpass bash -norc
     bash: cannot set terminal process group (-1): Inappropriate ioctl for device
     bash: no job control in this shell
     bash-5.0# read < /dev/tty
@@ -72,7 +72,7 @@ Example #4
 Example #5
 ----------
 
-    % sshpass bash --norc
+    $ sshpass bash --norc
     bash: cannot set terminal process group (-1): Inappropriate ioctl for device
     bash: no job control in this shell
     bash-5.0# echo password: > /dev/tty
@@ -81,7 +81,7 @@ Example #5
 Example #6
 ----------
 
-    shpass -p xxx bash --norc
+    $ sshpass -p xxx bash --norc
     bash: cannot set terminal process group (-1): Inappropriate ioctl for device
     bash: no job control in this shell
     bash-5.0# echo password: > /dev/tty
