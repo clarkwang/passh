@@ -40,7 +40,7 @@ Now let's try `passh`:
 Example #2
 ----------
 
-    $ sshpass bash -norc
+    $ sshpass bash --norc
     bash: cannot set terminal process group (-1): Inappropriate ioctl for device
     bash: no job control in this shell
     bash-5.0#    <== Press Ctrl-C here and the shell will be killed.
@@ -48,7 +48,7 @@ Example #2
 Example #3
 ----------
 
-    $ sshpass bash -norc
+    $ sshpass bash --norc
     bash: cannot set terminal process group (-1): Inappropriate ioctl for device
     bash: no job control in this shell
     bash-5.0# sleep 60
@@ -57,7 +57,7 @@ Example #3
 Example #4
 ----------
 
-    $ sshpass bash -norc
+    $ sshpass bash --norc
     bash: cannot set terminal process group (-1): Inappropriate ioctl for device
     bash: no job control in this shell
     bash-5.0# read < /dev/tty
