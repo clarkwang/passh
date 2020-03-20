@@ -66,8 +66,8 @@ Example #4
     read
     from
     /dev/tty
-        <== Thre 'read' never returns. Ctrl-D does not work either.
-        <== You have to press Ctrl-C to kill bash.
+              <== Thre 'read' never returns. Ctrl-D does not work either.
+              <== You have to press Ctrl-C to kill bash.
 
 Example #5
 ----------
@@ -76,7 +76,7 @@ Example #5
     bash: cannot set terminal process group (-1): Inappropriate ioctl for device
     bash: no job control in this shell
     bash-5.0# echo password: > /dev/tty
-    bash-5.0#    <== It hangs here.
+    bash-5.0#                            <== It hangs here. Press Ctrl-C to kill it.
 
 Example #6
 ----------
@@ -86,5 +86,4 @@ Example #6
     bash: no job control in this shell
     bash-5.0# echo password: > /dev/tty
     bash-5.0# echo password: > /dev/tty
-    bash-5.0#
-        <== The two echo commands killed Bash.
+    $                                    <== The two echo commands killed Bash.
