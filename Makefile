@@ -4,6 +4,6 @@ all: passh
 passh: passh.c
 
 clean:
-	rm passh
+	-rm passh
 
 .PHONY: all clean
