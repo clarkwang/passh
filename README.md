@@ -42,6 +42,7 @@ Tested on:
 * macOS 10.12 (Sierra)
 * Cygwin, x86_64 (on Windows 7)
 * FreeBSD 11.1, x86_64
+* AIX 7.2, ppc64le (added in [issue #7](https://github.com/clarkwang/passh/issues/7))
 
   [newifi]: https://wiki.openwrt.org/toh/lenovo/lenovo_y1_v1
 
