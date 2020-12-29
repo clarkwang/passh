@@ -87,3 +87,11 @@ Example #6
     bash-5.0# echo password: > /dev/tty
     bash-5.0# echo password: > /dev/tty
     $                                    <== The two echo commands killed Bash.
+
+Example #7
+----------
+
+    # sshpass -p some-passwd ssh no-such-user@127.0.0.1 date
+    # echo $?                            <== It silently fails. No error messages.
+    5
+    #
