@@ -88,6 +88,13 @@ Tested on:
 
   [sshpass]: https://sourceforge.net/projects/sshpass/
 
+## Auto answer questions
+
+You can use `passh` for more than just inputting the passwords. For example, you could use this to both enter the password and answer yes to the question `Proceed with propagating updates` with the `unison` bidirecional sync tool:
+1. `passh -P 'Proceed with propagating updates' -p y passh -P '[Pp]assword: \{0,1\}$' -p password unison ...` 
+
+`unison` has the builtin option called `-batch` to answer yes to this question `Proceed with propagating updates`, however that option also implies to ignore conflicts and fail silently. Then, using `passh` to answer `y` to the input question `Proceed with propagating updates` allows you to automate the process when there is no conflicts, because when there are conflicts the first question would be to chose which file should be synced.
+
 ## examples
 
 1. `sshpass` is *better* in its own way.
