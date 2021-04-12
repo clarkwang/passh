@@ -88,7 +88,7 @@ Tested on:
 
   [sshpass]: https://sourceforge.net/projects/sshpass/
 
-## Auto answer questions
+## auto answer questions
 
 You can use `passh` for more than just inputting the passwords. For example, you could use this to both enter the password and answer yes to the question `Proceed with propagating updates` with the `unison` bidirecional sync tool:
 1. `passh -P 'Proceed with propagating updates' -p y passh -P '[Pp]assword: \{0,1\}$' -p password unison ...` 
