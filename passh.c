@@ -78,6 +78,7 @@ static struct {
         bool nohup_child;
         bool fatal_no_prompt;
         bool auto_yesno;
+        bool ere;
         char *password;
         char *passwd_prompt;
         char *yesno_prompt;
@@ -100,6 +101,7 @@ usage(int exitcode)
            "\n"
            "  -c <N>          Send at most <N> passwords (0 means infinite. Default: %d)\n"
            "  -C              Exit if prompted for the <N+1>th password\n"
+           "  -E              Interpret the prompt pattern as an ERE rather than BRE\n"
            "  -h              Help\n"
            "  -i              Case insensitive for password prompt matching\n"
            "  -n              Nohup the child (e.g. used for `ssh -f')\n"
@@ -220,13 +222,16 @@ getargs(int argc, char **argv)
      * POSIXLY_CORRECT is set, then option processing stops as soon as a
      * nonoption argument is encountered.
      */
-    while ((ch = getopt(argc, argv, "+:c:Chil:L:np:P:t:Ty")) != -1) {
+    while ((ch = getopt(argc, argv, "+:c:CEhil:L:np:P:t:Ty")) != -1) {
         switch (ch) {
             case 'c':
                 g.opt.tries = atoi(optarg);
                 break;
             case 'C':
                 g.opt.fatal_more_tries = true;
+                break;
+            case 'E':
+                g.opt.ere = true;
                 break;
             case 'h':
                 usage(0);
@@ -301,6 +306,7 @@ getargs(int argc, char **argv)
     /* Password: */
     reflag = 0;
     reflag |= g.opt.ignore_case ? REG_ICASE : 0;
+    reflag |= g.opt.ere ? REG_EXTENDED : 0;
     r = regcomp(&g.opt.re_prompt, g.opt.passwd_prompt, reflag);
     if (r != 0) {
         fatal(ERROR_USAGE, "Error: invalid RE for password prompt");
