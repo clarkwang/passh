@@ -62,6 +62,9 @@
 #define ERROR_SYS        (200 + 4)
 #define ERROR_MAX_TRIES  (200 + 5)
 
+char * const MY_NAME  = "passh";
+char * const VERSION_ = "1.0.1";
+
 static struct {
     char *progname;
     bool reset_on_exit;
@@ -94,6 +97,14 @@ static struct {
 } g;
 
 void
+show_version(void)
+{
+    printf("%s %s\n", MY_NAME, VERSION_);
+
+    exit(0);
+}
+
+void
 usage(int exitcode)
 {
     printf("Usage: %s [OPTION]... COMMAND...\n"
@@ -113,6 +124,7 @@ usage(int exitcode)
            "  -t <timeout>    Timeout waiting for next password prompt\n"
            "                  (0 means no timeout. Default: %d)\n"
            "  -T              Exit if timed out waiting for password prompt\n"
+           "  -V              Show version\n"
            "  -y              Auto answer `(yes/no)?' questions\n"
 #if 0
            "  -Y <pattern>    Regexp (BRE) for the `yes/no' prompt\n"
@@ -215,12 +227,16 @@ getargs(int argc, char **argv)
         usage(0);
     }
 
+    if (argc == 2 && strcmp("--version", argv[1]) == 0) {
+        show_version();
+    }
+
     /*
      * If the first character of optstring is '+' or the environment variable
      * POSIXLY_CORRECT is set, then option processing stops as soon as a
      * nonoption argument is encountered.
      */
-    while ((ch = getopt(argc, argv, "+:c:Chil:L:np:P:t:Ty")) != -1) {
+    while ((ch = getopt(argc, argv, "+:c:Chil:L:np:P:t:TVy")) != -1) {
         switch (ch) {
             case 'c':
                 g.opt.tries = atoi(optarg);
@@ -267,6 +283,10 @@ getargs(int argc, char **argv)
 
             case 'T':
                 g.opt.fatal_no_prompt = true;
+                break;
+
+            case 'V':
+                show_version();
                 break;
 
             case 'y':
