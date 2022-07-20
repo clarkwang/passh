@@ -7,7 +7,7 @@
 ## compile
 
     $ cc -o passh passh.c
-    $ cp -v passh /bin/
+    $ cp -v passh /usr/bin/
     $ passh -h
 
 ## usage 
