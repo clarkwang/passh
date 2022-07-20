@@ -7,7 +7,9 @@
 ## compile
 
     $ cc -o passh passh.c
-    
+    $ cp -v passh /bin/
+    $ passh -h
+
 ## usage 
 
 ```
