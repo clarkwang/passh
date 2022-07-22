@@ -63,7 +63,7 @@
 #define ERROR_MAX_TRIES  (200 + 5)
 
 char * const MY_NAME  = "passh";
-char * const VERSION_ = "1.0.1";
+char * const VERSION_ = "1.0.2";
 
 static struct {
     char *progname;
@@ -189,12 +189,18 @@ arg2pass(char *optarg)
 
     if (strncmp(optarg, "file:", 5) == 0) {
         FILE *fp = fopen(optarg + 5, "r");
-        char buf[64] = "";
+        char buf[1024] = "";
 
-        fgets(buf, sizeof(buf), fp);
+        if (fp == NULL) {
+            fatal_sys("failed to open file %s", optarg + 5);
+        }
+
+        if (fgets(buf, sizeof(buf), fp) == NULL) {
+            fatal(ERROR_GENERAL, "failed to read the file");
+        }
         fclose(fp);
 
-        pass = strtok(buf, " \r\n");
+        pass = strtok(buf, "\r\n");
         if (pass) {
             pass = strdup(pass);
         } else {
@@ -204,6 +210,8 @@ arg2pass(char *optarg)
         pass = getenv(optarg + 4);
         if (pass) {
             pass = strdup(pass);
+        } else {
+            fatal(ERROR_GENERAL, "env var not found: %s", optarg + 4);
         }
     } else {
         pass = strdup(optarg);
