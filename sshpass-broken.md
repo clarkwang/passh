@@ -66,7 +66,7 @@ Example #4
     read
     from
     /dev/tty
-              <== Thre 'read' never returns. Ctrl-D does not work either.
+              <== The 'read' never returns. Ctrl-D does not work either.
               <== You have to press Ctrl-C to kill bash.
 
 Example #5
