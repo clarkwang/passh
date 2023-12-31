@@ -641,19 +641,22 @@ sig_winch(int signum)
     return;
 }
 
-#define write2(fd1, fd2, buf, len) \
-    do { \
-        int fds[2] = { fd1, fd2 }; \
-        int i; \
-        for (i = 0; i < 2; ++i) { \
-            if (fds[i] < 0) { \
-                continue; \
-            } \
-            if (writen(fds[i], buf, (len) ) != (len) ) { \
-                fatal_sys("write: fd %d", fds[i]); \
-            } \
-        } \
-    } while (0)
+void
+write2(int fd1, int fd2, const void * buf, size_t len)
+{
+    int fds[2] = { fd1, fd2 };
+    int i;
+
+    for (i = 0; i < 2; ++i) {
+        if (fds[i] < 0) {
+            continue;
+        }
+        if (writen(fds[i], buf, len) != len) {
+            fatal_sys("write: fd %d", fds[i]);
+        }
+    }
+}
+
 void
 big_loop()
 {
