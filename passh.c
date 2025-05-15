@@ -45,7 +45,9 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <sys/select.h>
+#include <sys/socket.h>
 #include <sys/types.h>
+#include <sys/un.h>
 #include <sys/wait.h>
 #include <sys/time.h>
 
@@ -117,6 +119,7 @@ usage(int exitcode)
            "  -p <password>   The password (Default: `" DEFAULT_PASSWD "')\n"
            "  -p env:<var>    Read password from env var\n"
            "  -p file:<file>  Read password from file\n"
+           "  -p sock:<file>  Read password from UNIX socket\n"
            "  -P <prompt>     Regexp (BRE) for the password prompt\n"
            "                  (Default: `" DEFAULT_PROMPT "')\n"
            "  -l <file>       Save data written to the pty\n"
@@ -182,6 +185,37 @@ startup()
     g.opt.timeout = DEFAULT_TIMEOUT;
 }
 
+int
+socketread(char *buf, size_t len, char *path)
+{
+    int fd, ret;
+    size_t n;
+    struct sockaddr_un addr;
+
+    fd = socket(AF_UNIX, SOCK_STREAM, 0);
+    if (fd < 0) {
+        return -1;
+    }
+
+    memset(&addr, 0, sizeof(addr));
+    addr.sun_family = AF_UNIX;
+    strncpy(addr.sun_path, path, sizeof(addr.sun_path) - 1);
+
+    ret = connect(fd, (const struct sockaddr *) &addr, sizeof(addr));
+    if (ret < 0) {
+        return -1;
+    }
+
+    n = read(fd, buf, len - 1);
+    close(fd);
+    if (n <= 0) {
+        return -1;
+    }
+
+    buf[n] = '\0';
+    return 0;
+}
+
 char *
 arg2pass(char *optarg)
 {
@@ -213,6 +247,14 @@ arg2pass(char *optarg)
         } else {
             fatal(ERROR_GENERAL, "env var not found: %s", optarg + 4);
         }
+    } else if (strncmp(optarg, "sock:", 5) == 0) {
+        char buf[1024] = "";
+
+        if (socketread(buf, sizeof(buf), optarg + 5) < 0) {
+            fatal(ERROR_GENERAL, "failed to read from socket");
+        }
+
+        pass = strdup(buf);
     } else {
         pass = strdup(optarg);
     }
