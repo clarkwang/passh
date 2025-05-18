@@ -185,11 +185,11 @@ startup()
     g.opt.timeout = DEFAULT_TIMEOUT;
 }
 
-int
+ssize_t
 socketread(char *buf, size_t len, char *path)
 {
     int fd, ret;
-    size_t n;
+    ssize_t n;
     struct sockaddr_un addr;
 
     fd = socket(AF_UNIX, SOCK_STREAM, 0);
@@ -202,18 +202,20 @@ socketread(char *buf, size_t len, char *path)
     strncpy(addr.sun_path, path, sizeof(addr.sun_path) - 1);
 
     ret = connect(fd, (const struct sockaddr *) &addr, sizeof(addr));
+    /* Don't close(fd) on error so the caller can inspect errno. */
     if (ret < 0) {
         return -1;
     }
 
     n = read(fd, buf, len - 1);
-    close(fd);
-    if (n <= 0) {
+    /* Don't close(fd) on error so the caller can inspect errno. */
+    if (n < 0) {
         return -1;
     }
+    close(fd);
 
     buf[n] = '\0';
-    return 0;
+    return n;
 }
 
 char *
@@ -251,7 +253,7 @@ arg2pass(char *optarg)
         char buf[1024] = "";
 
         if (socketread(buf, sizeof(buf), optarg + 5) < 0) {
-            fatal(ERROR_GENERAL, "failed to read from socket");
+            fatal_sys("failed to read from socket %s", optarg + 5);
         }
 
         pass = strdup(buf);
